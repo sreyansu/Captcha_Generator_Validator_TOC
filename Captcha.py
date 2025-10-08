@@ -6,12 +6,14 @@ import string
 captcha_text = ""
 attempts = 3
 
+#CAPTCHA Generation Text
 def generate_text():
     """Generate a simple 6-character alphanumeric CAPTCHA (uppercase + digits)."""
     global captcha_text
     captcha_text = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
     return captcha_text
 
+#Fuction for captcha stenography
 def create_image(text):
     """Create CAPTCHA image with basic distortion and noise."""
     width, height = 250, 80
@@ -46,6 +48,7 @@ def create_image(text):
 
     return image
 
+#Validate the CAPTCHA Text
 def validate(user_input):
     """Validate user input against the generated CAPTCHA."""
     global attempts
