@@ -6,14 +6,14 @@ import string
 captcha_text = ""
 attempts = 3
 
-#CAPTCHA Generation Text
+# CAPTCHA Generation Text
 def generate_text():
     """Generate a simple 6-character alphanumeric CAPTCHA (uppercase + digits)."""
     global captcha_text
     captcha_text = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
     return captcha_text
 
-#Fuction for captcha stenography
+# Function for captcha stenography
 def create_image(text):
     """Create CAPTCHA image with basic distortion and noise."""
     width, height = 250, 80
@@ -48,7 +48,7 @@ def create_image(text):
 
     return image
 
-#Validate the CAPTCHA Text
+# Validate the CAPTCHA Text
 def validate(user_input):
     """Validate user input against the generated CAPTCHA."""
     global attempts
@@ -64,34 +64,17 @@ def validate(user_input):
         attempts -= 1
         return False, f"✗ Wrong! {attempts} attempts left."
 
-def main():
+def reset_attempts():
+    """Reset the number of attempts for a new CAPTCHA session."""
     global attempts
-    print("=" * 50)
-    print("   SIMPLE CAPTCHA GENERATOR AND VALIDATOR")
-    print("=" * 50)
+    attempts = 3
 
+def get_captcha():
+    """Generate a new CAPTCHA and return the image and text."""
+    reset_attempts()
     text = generate_text()
     image = create_image(text)
-    image.save('captcha.png')
-    try:
-        image.show()
-    except:
-        pass
-
-    print(f"\n[CAPTCHA Image Generated: captcha.png]")
-    print(f"\nYou have {attempts} attempts.")
-
-    while attempts > 0:
-        user_input = input("\nEnter CAPTCHA: ")
-        is_valid, message = validate(user_input)
-        print(message)
-        if is_valid:
-            print("\nAccess Granted. Verification successful.")
-            break
-    else:
-        print("\nMaximum attempts exceeded. Access Denied!")
-
-    print("\n" + "=" * 50)
+    return image, text
 
 if __name__ == "__main__":
-    main()
+    pass  # This file is intended to be used as a module.

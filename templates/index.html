@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Captcha Demo</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 24px; }
+    img { border: 1px solid #ccc; display:block; margin-bottom:8px; }
+    .msg { margin-top: 12px; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h2>Simple CAPTCHA</h2>
+
+  <img id="captcha-image" src="{{ url_for('captcha_image') }}" alt="CAPTCHA Image">
+  <button id="refreshBtn">Refresh</button>
+
+  <form id="captchaForm">
+    <div>
+      <label for="captcha_input">Enter CAPTCHA:</label>
+      <input type="text" name="captcha_input" id="captcha_input" autocomplete="off" required />
+      <button type="submit">Verify</button>
+    </div>
+  </form>
+
+  <div class="msg" id="message"></div>
+
+  <script>
+    const img = document.getElementById('captcha-image');
+    document.getElementById('refreshBtn').addEventListener('click', () => {
+      img.src = '{{ url_for("captcha_image") }}' + '?t=' + Date.now();
+      document.getElementById('message').textContent = '';
+    });
+
+    document.getElementById('captchaForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const form = new FormData(e.target);
+      const resp = await fetch('/validate', { method: 'POST', body: form });
+      const data = await resp.json();
+      const msgEl = document.getElementById('message');
+      msgEl.textContent = data.message;
+      msgEl.style.color = data.is_valid ? 'green' : 'red';
+      if (!data.is_valid) {
+        // optional: refresh captcha on wrong answer
+        img.src = '{{ url_for("captcha_image") }}' + '?t=' + Date.now();
+      }
+    });
+  </script>
+</body>
+</html>
