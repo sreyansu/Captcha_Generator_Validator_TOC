@@ -1,4 +1,3 @@
-
 from flask import Flask, render_template, request, jsonify, send_file
 import io
 from Captcha import get_captcha, validate

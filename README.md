@@ -25,7 +25,6 @@ captcha-web-app
 1. **Clone the repository:**
    ```
    git clone <repository-url>
-   cd captcha-web-app
    ```
 
 2. **Create a virtual environment (optional but recommended):**

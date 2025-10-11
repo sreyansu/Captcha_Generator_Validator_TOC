@@ -2,34 +2,43 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <title>Captcha Demo</title>
-  <style>
-    body { font-family: Arial, sans-serif; padding: 24px; }
-    img { border: 1px solid #ccc; display:block; margin-bottom:8px; }
-    .msg { margin-top: 12px; font-weight: bold; }
-  </style>
+  <title>CAPTCHA Demo</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-  <h2>Simple CAPTCHA</h2>
+  <main class="page">
+    <header class="hero">
+      <h1 class="title">CAPTCHA Demo</h1>
+      <p class="subtitle">A simple math-based captcha generator and validator</p>
+    </header>
 
-  <img id="captcha-image" src="{{ url_for('captcha_image') }}" alt="CAPTCHA Image">
-  <button id="refreshBtn">Refresh</button>
+    <section class="card">
+      <h2 class="card-title">CAPTCHA Verification</h2>
+      <p class="card-sub">Please solve the math problem below to continue</p>
 
-  <form id="captchaForm">
-    <div>
-      <label for="captcha_input">Enter CAPTCHA:</label>
-      <input type="text" name="captcha_input" id="captcha_input" autocomplete="off" required />
-      <button type="submit">Verify</button>
-    </div>
-  </form>
+      <div class="captcha-box">
+        <img id="captcha-image" src="{{ url_for('captcha_image') }}" alt="CAPTCHA Image">
+        <button id="refreshBtn" class="refresh" title="Refresh CAPTCHA">⟳</button>
+      </div>
 
-  <div class="msg" id="message"></div>
+      <form id="captchaForm" class="form" autocomplete="off">
+        <input type="text" name="captcha_input" id="captcha_input" placeholder="Enter your answer" required />
+        <button type="submit" class="verify-btn">Verify</button>
+      </form>
+    </section>
+
+    <footer class="note">
+      <p>This captcha generates random math problems to verify you're human.</p>
+      <p>Features: Auto-refresh on wrong answers, attempt tracking, and visual styling.</p>
+    </footer>
+  </main>
 
   <script>
     const img = document.getElementById('captcha-image');
     document.getElementById('refreshBtn').addEventListener('click', () => {
       img.src = '{{ url_for("captcha_image") }}' + '?t=' + Date.now();
-      document.getElementById('message').textContent = '';
+      document.getElementById('message')?.remove();
+      document.getElementById('captcha_input').value = '';
     });
 
     document.getElementById('captchaForm').addEventListener('submit', async (e) => {
@@ -37,12 +46,21 @@
       const form = new FormData(e.target);
       const resp = await fetch('/validate', { method: 'POST', body: form });
       const data = await resp.json();
-      const msgEl = document.getElementById('message');
-      msgEl.textContent = data.message;
-      msgEl.style.color = data.is_valid ? 'green' : 'red';
+      // simple inline feedback
+      let msg = document.getElementById('message');
+      if (!msg) {
+        msg = document.createElement('div');
+        msg.id = 'message';
+        msg.className = 'msg';
+        document.querySelector('.card').appendChild(msg);
+      }
+      msg.textContent = data.message;
+      msg.classList.toggle('success', data.is_valid);
+      msg.classList.toggle('error', !data.is_valid);
       if (!data.is_valid) {
-        // optional: refresh captcha on wrong answer
         img.src = '{{ url_for("captcha_image") }}' + '?t=' + Date.now();
+      } else {
+        document.getElementById('captcha_input').value = '';
       }
     });
   </script>
